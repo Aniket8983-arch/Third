@@ -1,0 +1,116 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+df = pd.read_csv('iris - iris.csv')
+df.head()
+df.isna().sum()
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+df['variety'] = le.fit_transform(df['variety'])
+df.head()
+df.describe()
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import f1_score
+X = df.drop(["variety"],axis=1)
+y = df["variety"]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+neigh = KNeighborsClassifier(n_neighbors=3)
+neigh.fit(X_train , y_train)
+print(y_test.shape)
+y_pred = neigh.predict(X_train)
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(y_train, y_pred)
+print("Confusion Matrix :\n", cm)
+print("Accuracy:", accuracy_score(y_train, y_pred))
+print("Precision:", precision_score(y_train, y_pred, average="macro"))
+print("Recall:", recall_score(y_train, y_pred, average="macro"))
+print("F1-Score:", f1_score(y_train, y_pred, average="macro"))
+y_pred2 = neigh.predict(X_test)
+from sklearn.metrics import confusion_matrix
+cm2 = confusion_matrix(y_test, y_pred2)
+print("Confusion Matrix :\n", cm2)
+print("Accuracy:", accuracy_score(y_test, y_pred2))
+print("Precision:", precision_score(y_test, y_pred2, average="macro"))
+print("Recall:", recall_score(y_test, y_pred2, average="macro"))
+print("F1-Score:", f1_score(y_test, y_pred2, average="macro"))
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.inspection import DecisionBoundaryDisplay
+from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
+import numpy as np
+X_data = X_train[["petal.length", "petal.width"]]
+n = KNeighborsClassifier(n_neighbors=9)
+n.fit(X_data, y_train)
+DecisionBoundaryDisplay.from_estimator(n,X_data,response_method="predict",alpha=0.3)
+plt.scatter(X_data["petal.length"],X_data["petal.width"],c=y_train,cmap="Set2")
+plt.xlabel("Petal Length")
+plt.ylabel("Petal Width")
+plt.title("KNN Classification (K=9)")
+plt.show()
+from sklearn.linear_model import LogisticRegression
+lr = LogisticRegression()
+lr.fit(X_train, y_train)
+y_pred3 = lr.predict(X_test)
+print("Accuracy:", accuracy_score(y_test, y_pred3))
+print("Precision:", precision_score(y_test, y_pred3, average="macro"))
+print("Recall:", recall_score(y_test, y_pred3, average="macro"))
+print("F1-Score:", f1_score(y_test, y_pred3, average="macro"))
+print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred3))
+from sklearn.linear_model import LogisticRegression
+from sklearn.inspection import DecisionBoundaryDisplay
+import seaborn as sns
+X_data = df[["petal.length", "petal.width"]]
+y_data = df["variety"]
+n = LogisticRegression(max_iter=1000)
+n.fit(X_data, y_data)
+DecisionBoundaryDisplay.from_estimator(n, X_data, response_method="predict", alpha=0.3)
+sns.scatterplot(data=df, x="petal.length", y="petal.width",hue="variety", palette="Set2")
+plt.xlabel("Petal Length")
+plt.ylabel("Petal Width")
+plt.show()
+print("\nEnter flower measurements in cm :")
+sl = float(input("Sepal length (4 to 8): "))
+sw = float(input("Sepal width: (2 to 4.5): "))
+pl = float(input("Petal length: (1 to 7): "))
+pw = float(input("Petal width: (0.2 to 2.5): "))
+user_data = pd.DataFrame(
+columns=X.columns
+)
+lr_prediction = lr.predict(user_data)[0]
+knn_prediction = neigh.predict(user_data)[0]
+print("\nLogistic Regression Prediction:", lr_prediction)
+print("KNN Prediction:", knn_prediction)
+knn_result = le.inverse_transform([lr_prediction])
+lr_result = le.inverse_transform([knn_prediction])
+print("\nLogistic Regression Prediction:", lr_result)
+print("KNN Prediction:", knn_result)
+from sklearn.linear_model import LogisticRegression
+lr = LogisticRegression()
+lr.fit(X_train, y_train)
+y_pred3 = lr.predict(X_test)
+print("Accuracy:", accuracy_score(y_test, y_pred3))
+print("Precision:", precision_score(y_test, y_pred3, average="macro"))
+print("Recall:", recall_score(y_test, y_pred3, average="macro"))
+print("F1-Score:", f1_score(y_test, y_pred3, average="macro"))
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.inspection import DecisionBoundaryDisplay
+import seaborn as sns
+
+X_data = df[["petal.length", "petal.width"]]
+y_data = df["variety"]
+n = LogisticRegression(max_iter=1000)
+n.fit(X_data, y_data)
+DecisionBoundaryDisplay.from_estimator(
+    n, X_data, response_method="predict", alpha=0.3
+)
+sns.scatterplot(
+    data=df, x="petal.length", y="petal.width",
+    hue="variety", palette="Set2"
+)
+plt.xlabel("Petal Length")
+plt.ylabel("Petal Width")
+plt.show()

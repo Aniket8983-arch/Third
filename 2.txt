@@ -1,0 +1,81 @@
+graph={}
+
+m=int(input('No. of Vertices:'))
+
+for i in range(m):
+    vertex=input('Enter vertex:')
+    graph[vertex]=[]
+
+    n=int(input('Enter the no. of adjacent vertices:'))
+    for j in range(n):
+        adj=input('Enter adjacent vertex')
+        graph[vertex].append(adj)
+
+print('Your graph is:',graph)
+
+start=input('Enter start vertex:')
+goal=input('Enter goal vertex:')
+
+while True:
+
+    print('1:BFS')
+    print('2:DFS')
+    print('3:Exit')
+
+    ch=int(input('Enter your choice:'))
+           
+    if ch==1:
+        visited=[]
+        queue=[]
+        bfs=[]
+        
+        visited.append(start)
+        queue.append(start)
+        print('Visited\tQueue')
+        while len(queue) >0:
+            node=queue.pop(0)
+            bfs.append(node)
+        
+            if node==goal:
+                print('Reached goal node')
+                print('BFS path:',bfs)
+        
+            for node in graph[node]:
+                if node not in visited:
+                    visited.append(node)
+                    queue.append(node)
+
+            # print(node,'\t',queue)
+
+        print('BFS Traversal:',bfs)
+    elif ch==2:
+        visited=[]
+        stack=[]
+        dfs=[]
+
+        visited.append(start)
+        stack.append(start)
+        print('Visited\tStack')
+        while len(stack) >0:
+            node=stack.pop()
+            dfs.append(node)
+            
+            if node==goal:
+                print('Goal Reached')
+                print('DFS Path:',dfs)
+
+            for node in reversed(graph[node]):
+                if node not in visited:
+                    visited.append(node)
+                    stack.append(node)
+            # print(node,'\t',stack)
+            
+        print('DFS Traversal:',dfs)
+
+
+    elif ch==3:
+        print('Program ended')
+        break
+
+    else:
+        print('Invalid choice')

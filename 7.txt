@@ -1,0 +1,108 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+df=pd.read_csv("iris.csv")
+df.describe()
+# df.shape
+
+print(df.duplicated().sum())
+
+df =df.drop_duplicates()
+
+print(df.duplicated().sum())
+
+df.isna().sum()
+
+df.head()
+
+from sklearn.preprocessing import LabelEncoder
+le=LabelEncoder()
+
+df['variety'] = le.fit_transform(df['variety'])
+
+df.head()
+
+df.describe()
+
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import f1_score
+
+X=df.drop(['variety'],axis=1)
+y=df['variety']
+
+X_train,X_test,y_train,y_test =train_test_split(X,y,test_size=0.2,random_state=42)
+
+model=KNeighborsClassifier(n_neighbors=3)
+model.fit(X_train,y_train)
+y_pred=model.predict(X_train)
+
+from sklearn.metrics import confusion_matrix
+
+cm = confusion_matrix(y_train,y_pred)
+print(cm)
+
+print("Accuracy: \n",accuracy_score(y_train,y_pred))
+print("Precision: \n",precision_score(y_train,y_pred,average='macro'))
+print("Recall: \n",recall_score(y_train,y_pred,average='macro'))
+print("F1: \n",f1_score(y_train,y_pred,average='macro'))
+
+model2=KNeighborsClassifier(n_neighbors=3)
+model2.fit(X_train,y_train)
+y_pred2=model2.predict(X_test)
+
+cm2=confusion_matrix(y_test,y_pred2)
+print(cm2)
+
+print("Accuracy",accuracy_score(y_test,y_pred2))
+print("precision",precision_score(y_test,y_pred2,average='macro'))
+print("recall",recall_score(y_test,y_pred2,average='macro'))
+print("F1",f1_score(y_test,y_pred2,average='macro'))
+
+X_data=X_train[['petal.length', 'petal.width']]
+
+model3=KNeighborsClassifier(n_neighbors=9)
+model3.fit(X_data,y_train)
+
+from sklearn.inspection import DecisionBoundaryDisplay
+
+DecisionBoundaryDisplay.from_estimator(model3,X_data,response_method='predict',alpha=0.3)
+plt.scatter(X_data['petal.length'],X_data['petal.width'],c=y_train,cmap='Set2')
+
+plt.title("KNN Classification")
+plt.xlabel("Petal Length")
+plt.ylabel("Petal Width")
+plt.show()
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix
+
+model4=LogisticRegression()
+model4.fit(X_train,y_train)
+y_pred3=model4.predict(X_test)
+
+print("Accuracy:",accuracy_score(y_test,y_pred3))
+print("Precision:",precision_score(y_test,y_pred3,average='macro'))
+print("Recall:",recall_score(y_test,y_pred3,average='macro'))
+print("F1:",f1_score(y_test,y_pred3,average='macro'))
+
+cm=confusion_matrix(y_test,y_pred3)
+
+print(cm)
+
+X_data1=X_train[['petal.length','petal.width']]
+
+model5=LogisticRegression()
+model5.fit(X_data1,y_train)
+
+DecisionBoundaryDisplay.from_estimator(model5,X_data1,response_method='predict',alpha=0.3)
+plt.scatter(X_data1['petal.length'],X_data1['petal.width'],c=y_train,cmap='Set1')
+
+plt.title('Logistic Regression')
+plt.xlabel('Petal Length')
+plt.ylabel('Petal Width')
+plt.show()

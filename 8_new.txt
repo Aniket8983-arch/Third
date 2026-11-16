@@ -1,0 +1,125 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("Admission_Predict - Admission_Predict.csv")
+df.head()
+
+df["Admit"] = (df["Chance of Admit"] > 0.87).astype(int)
+df.head()
+df = df.drop(["Chance of Admit", "Serial No."], axis=1)
+df
+df.duplicated().sum()
+df.isna().sum()
+df["Research"] = df["Research"].fillna(df["Research"].mode()[0])
+df.isna().sum()
+
+X = df.drop(columns=["Admit"])
+y = df["Admit"]
+
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.metrics import precision_score, recall_score, f1_score
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+model1 = DecisionTreeClassifier(criterion="entropy", random_state=42)
+model1.fit(X_train, y_train)
+y_pred = model1.predict(X_test)
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Precision:", precision_score(y_test, y_pred))
+print("Recall:", recall_score(y_test, y_pred))
+print("F1 Score:", f1_score(y_test, y_pred))
+
+from sklearn.tree import plot_tree
+plt.figure(figsize=(15, 10))
+plot_tree(model1, filled=True)
+plt.show()
+
+model2 = DecisionTreeClassifier(criterion="gini", random_state=42)
+model2.fit(X_train, y_train)
+y_pred2 = model2.predict(X_test)
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred2))
+print("Accuracy:", accuracy_score(y_test, y_pred2))
+print("Precision:", precision_score(y_test, y_pred2))
+print("Recall:", recall_score(y_test, y_pred2))
+print("F1 Score:", f1_score(y_test, y_pred2))
+
+import matplotlib.pyplot as plt
+from sklearn.tree import plot_tree
+plt.figure(figsize=(15, 10))
+plot_tree(model2, filled=True)
+plt.show()
+
+from sklearn.naive_bayes import GaussianNB
+nb = GaussianNB()
+nb.fit(X_train, y_train)
+y_pred3 = nb.predict(X_test)
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred3))
+print("Accuracy:", accuracy_score(y_test, y_pred3))
+print("Precision:", precision_score(y_test, y_pred3, zero_division=0))
+print("Recall:", recall_score(y_test, y_pred3, zero_division=0))
+print("F1-Score:", f1_score(y_test, y_pred3, zero_division=0))
+
+df.columns
+corr = df.corr(numeric_only=True)
+plt.figure(figsize=(10, 8))
+sns.heatmap(
+    corr,
+    annot=True,
+    cmap="coolwarm",
+)
+plt.show()
+
+from sklearn.inspection import DecisionBoundaryDisplay
+X_data = df[["CGPA", "TOEFL Score"]]
+y_data = df["Admit"]
+n = GaussianNB()
+n.fit(X_data, y_data)
+DecisionBoundaryDisplay.from_estimator(
+    n, X_data, response_method="predict", alpha=0.3
+)
+sns.scatterplot(data=df, x="CGPA", y="TOEFL Score", hue=y_data, palette="Set2")
+plt.show()
+
+from sklearn.inspection import DecisionBoundaryDisplay
+X_data = df[["CGPA", "GRE Score"]]
+y_data = df["Admit"]
+n = GaussianNB()
+n.fit(X_data, y_data)
+DecisionBoundaryDisplay.from_estimator(
+    n, X_data, response_method="predict", alpha=0.3
+)
+sns.scatterplot(data=df, x="CGPA", y="GRE Score", hue=y_data, palette="Set2")
+plt.show()
+
+gre = float(input("Enter GRE Score: "))
+toefl = float(input("Enter TOEFL Score: "))
+university_rating = int(input("Enter University Rating (1-5): "))
+sop = float(input("Enter SOP strength (1-5): "))
+lor = float(input("Enter LOR strength (1-5): "))
+cgpa = float(input("Enter CGPA: "))
+research = int(input("Research experience (0 or 1): "))
+
+user_data = pd.DataFrame(
+    [[gre, toefl, university_rating, sop, lor, cgpa, research]],
+    columns=X.columns
+)
+dt_prediction = model2.predict(user_data)
+nb_prediction = nb.predict(user_data)
+print("Decision Tree Prediction:", dt_prediction)
+print("Naive Bayes Prediction:", nb_prediction)
+
+if dt_prediction[0] == 1:
+    print("Decision Tree: Admitted")
+else:
+    print("Decision Tree: Not Admitted")
+
+if nb_prediction[0] == 1:
+    print("Naive Bayes: Admitted")
+else:
+    print("Naive Bayes: Not Admitted")

@@ -1,0 +1,136 @@
+# DISPLAY TROUBLESHOOTING EXPERT SYSTEM
+
+questions = {
+    "display_power_off": "Is the display power OFF?",
+    "no_display_signal": "Does the monitor show No Signal?",
+    "display_settings_wrong": "Are the display settings incorrect?",
+    "display_driver_issue": "Is there a display driver problem?"
+}
+
+rules = {
+    "Display is powered OFF": {
+        "display_power_off": True
+    },
+
+    "Display cable connection problem": {
+        "display_power_off": False,
+        "no_display_signal": True
+    },
+
+    "Incorrect display settings": {
+        "display_power_off": False,
+        "no_display_signal": False,
+        "display_settings_wrong": True
+    },
+
+    "Display driver problem": {
+        "display_power_off": False,
+        "no_display_signal": False,
+        "display_settings_wrong": False,
+        "display_driver_issue": True
+    }
+}
+
+solutions = {
+    "Display is powered OFF":
+        "Check the power cable and switch ON the display.",
+
+    "Display cable connection problem":
+        "Reconnect the HDMI or DisplayPort cable.",
+
+    "Incorrect display settings":
+        "Set a supported screen resolution and refresh rate.",
+
+    "Display driver problem":
+        "Update or reinstall the graphics driver."
+}
+
+while True:
+
+    print("\n--- DISPLAY TROUBLESHOOTING SYSTEM ---")
+    print("1. Forward Chaining")
+    print("2. Backward Chaining")
+    print("3. Exit")
+
+    choice = input("Enter your choice: ")
+
+    # FORWARD CHAINING
+    if choice == "1":
+
+        facts = {}
+
+        print("\nAnswer the following questions:")
+
+        for fact in questions:
+            answer = input(questions[fact] + " (yes/no): ").lower()
+
+            if answer == "yes":
+                facts[fact] = True
+            else:
+                facts[fact] = False
+
+        found = False
+
+        for problem in rules:
+
+            matched = True
+
+            for fact in rules[problem]:
+                if facts[fact] != rules[problem][fact]:
+                    matched = False
+
+            if matched:
+                print("\nProblem identified:", problem)
+                print("Solution:", solutions[problem])
+                found = True
+                break
+
+        if not found:
+            print("No matching problem found.")
+
+    # BACKWARD CHAINING
+    elif choice == "2":
+
+        print("\nSelect your goal:")
+
+        goals = list(rules.keys())
+
+        for i in range(len(goals)):
+            print(i + 1, goals[i])
+
+        n = input("Enter goal number: ")
+
+        if n in ["1", "2", "3", "4"]:
+
+            goal = goals[int(n) - 1]
+            proved = True
+
+            print("\nChecking goal:", goal)
+
+            for fact in rules[goal]:
+
+                answer = input(
+                    questions[fact] + " (yes/no): "
+                ).lower()
+
+                if (answer == "yes") != rules[goal][fact]:
+                    proved = False
+                    print("Condition not satisfied:", fact)
+                    break
+
+            if proved:
+                print("\nProblem confirmed:", goal)
+                print("Solution:", solutions[goal])
+            else:
+                print("Goal is not proved.")
+
+        else:
+            print("Invalid goal number.")
+
+    # EXIT
+    elif choice == "3":
+        print("Program ended.")
+        break
+
+    else:
+        print("Invalid choice.")

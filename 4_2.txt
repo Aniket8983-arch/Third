@@ -1,0 +1,142 @@
+# PLANT DIAGNOSIS EXPERT SYSTEM
+
+rules = {
+    "low_nurishment": ["leaves_yellow", "dry_steam"],
+    "water_level_decrease": ["low_nurishment"],
+    "give_water_to_plants": ["water_level_decrease"]
+}
+
+questions = {
+    "leaves_yellow": "Are the leaves yellow?",
+    "dry_steam": "Is the plant stem dry?"
+}
+
+# BACKWARD CHAINING FUNCTION
+
+def backward(goal):
+
+    if goal in known_facts:
+        return True
+
+    if goal not in rules:
+
+        answer = input(questions[goal] + " (yes/no): ").lower()
+
+        if answer == "yes":
+            known_facts.append(goal)
+            return True
+        else:
+            return False
+
+    for fact in rules[goal]:
+
+        if not backward(fact):
+            return False
+
+    known_facts.append(goal)
+    print("Derived:", goal)
+
+    return True
+
+
+# MAIN PROGRAM
+
+while True:
+
+    print("\n--- PLANT DIAGNOSIS SYSTEM ---")
+    print("1. Forward Chaining")
+    print("2. Backward Chaining")
+    print("3. Exit")
+
+    choice = input("Enter your choice: ")
+
+    # FORWARD CHAINING
+
+    if choice == "1":
+
+        known_facts = []
+
+        print("\nAnswer the following questions:")
+
+        for fact in questions:
+
+            answer = input(questions[fact] + " (yes/no): ").lower()
+
+            if answer == "yes":
+                known_facts.append(fact)
+
+        change = True
+
+        while change:
+
+            change = False
+
+            for goal in rules:
+
+                matched = True
+
+                for fact in rules[goal]:
+                    if fact not in known_facts:
+                        matched = False
+
+                if matched and goal not in known_facts:
+
+                    known_facts.append(goal)
+                    print("Derived:", goal)
+                    change = True
+
+        print("\nKnown facts:", known_facts)
+
+        if "give_water_to_plants" in known_facts:
+            print("Conclusion: Give water to plants.")
+        else:
+            print("Conclusion: Plant watering recommendation not proved.")
+
+    # BACKWARD CHAINING
+
+    elif choice == "2":
+
+        print("\nSelect your goal:")
+        print("1. leaves_yellow")
+        print("2. dry_steam")
+        print("3. low_nurishment")
+        print("4. water_level_decrease")
+        print("5. give_water_to_plants")
+
+        goals = {
+            "1": "leaves_yellow",
+            "2": "dry_steam",
+            "3": "low_nurishment",
+            "4": "water_level_decrease",
+            "5": "give_water_to_plants"
+        }
+
+        n = input("Enter goal number: ")
+
+        if n in goals:
+
+            goal = goals[n]
+            known_facts = []
+
+            print("\nChecking goal:", goal)
+
+            if backward(goal):
+
+                print("\nGoal is proved:", goal)
+                print("Facts:", known_facts)
+
+            else:
+                print("\nGoal is not proved.")
+
+        else:
+            print("Invalid goal number.")
+
+    # EXIT
+
+    elif choice == "3":
+
+        print("Program ended.")
+        break
+
+    else:
+        print("Invalid choice.")

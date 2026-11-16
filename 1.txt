@@ -1,0 +1,43 @@
+automation=True
+
+while automation:
+
+    print('1:Run the Automation')
+    print('2:Stop the Atuomation')
+
+    ch=int(input('Enter your choice:'))
+
+    if ch==1:
+        temp=float(input('Enter the temperature in celsius:'))
+        person=input('Is person present(y/n):')
+        dark=input('Is the room dark(y/n):')
+
+        fan='OFF'
+        light='OFF'
+        ac='OFF'
+        heater='OFF'
+
+        if temp>25 and person=='y':
+            fan='ON'
+
+        if temp<10 and person=='y':
+            heater='ON'
+
+        if temp>28 and person=='y':
+            ac='ON'
+
+        if dark=='y' and person=='y':
+            light='ON'
+        
+        print('Light',light)
+        print('Fan',fan)
+        print('AC',ac)
+        print('Heater',heater)
+
+    elif ch==2:
+        automation=False
+        print('Thank You')
+
+    else:
+        print('Invalid choice')
+        break

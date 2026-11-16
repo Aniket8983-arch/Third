@@ -1,0 +1,81 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("Heart_dataset - Heart_dataset.csv")
+df.describe()
+df.shape
+print(df.columns)
+
+df = df.drop("Unnamed: 0", axis=1)
+df.head()
+df.duplicated()
+print(df.duplicated().sum())
+df.isna().sum()
+
+numeric_cols = df.select_dtypes(include=np.number).columns
+categorical_cols = df.select_dtypes(include='str').columns
+
+for col in numeric_cols:
+    df[col] = df[col].fillna(df[col].median())
+
+for col in categorical_cols:
+    df[col] = df[col].fillna(df[col].mode()[0])
+
+df.isna().sum()
+df.describe()
+
+numeric_df = df.select_dtypes(include="number")
+print("MEAN:\n", numeric_df.mean())
+print("\nMEDIAN:\n", numeric_df.median())
+print("\nMODE:\n", numeric_df.mode().iloc[0])
+print("STANDARD DEVIATION:\n", numeric_df.std())
+print("\nVARIANCE:\n", numeric_df.var())
+
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+df['AHD'] = le.fit_transform(df['AHD'])
+df.head()
+
+df = pd.get_dummies(
+    df,
+    columns=['ChestPain', 'Thal'],
+    drop_first=True
+)
+df.head()
+df = df.astype(int)
+
+df[['Age', 'RestBP', 'Chol', 'MaxHR']].hist(
+    figsize=(12, 8),
+    bins=10,
+    edgecolor='black'
+)
+plt.tight_layout()
+plt.show()
+
+plt.figure(figsize=(8, 5))
+sns.boxplot(x=df['Chol'])
+plt.title('Boxplot of Cholesterol')
+plt.xlabel('Cholesterol')
+plt.show()
+
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+df[["RestBP", "Age", "Chol", "MaxHR"]] = scaler.fit_transform(
+    df[["RestBP", "Age", "Chol", "MaxHR"]]
+)
+df.head()
+
+X = df.drop('AHD', axis=1)
+y = df['AHD']
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+print("X_train:", X_train.shape)
+print("X_test:", X_test.shape)
+print("y_train:", y_train.shape)
+print("y_test:", y_test.shape)

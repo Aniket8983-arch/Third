@@ -1,0 +1,98 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df=pd.read_csv('data (1).csv',header=None)
+df.describe()
+
+df.head()
+
+df.columns=[
+    'id','diagnosis','radius_mean','texture_mean','perimeter_mean','area_mean',
+    'smoothness_mean','compactness_mean','concavity_mean','concave_points_mean','symmetry_mean','fractal_dimension_mean',
+    'radius_se','texture_se','perimeter_se','area_se',
+    'smoothness_se','compactness_se','concavity_se','concave_points_se','symmetry_se','fractal_dimension_se',
+    'radius_worst','texture_worst','perimeter_worst','area_worst',
+    'smoothness_worst','compactness_worst','concavity_worst','concave_points_worst','symmetry_worst','fractal_dimension_worst'
+]
+
+df.head()
+
+print(df.duplicated().sum())
+
+df.isna().sum()
+
+from sklearn.preprocessing import LabelEncoder
+le=LabelEncoder()
+
+df['diagnosis']=le.fit_transform(df['diagnosis'])
+
+df.head()
+
+df=df.drop(['id'],axis=1)
+
+from sklearn.model_selection import train_test_split
+
+X=df.drop('diagnosis',axis=1)
+y=df['diagnosis']
+
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2,random_state=42)
+
+from sklearn.preprocessing import StandardScaler
+
+model1=StandardScaler()
+X_train_scaled=model1.fit_transform(X_train)
+X_test_scaled=model1.transform(X_test)
+
+from sklearn.linear_model import LogisticRegression
+
+model2=LogisticRegression()
+model2.fit(X_train_scaled,y_train)
+y_pred2=model2.predict(X_test_scaled)
+
+from sklearn.metrics import accuracy_score,precision_score
+from sklearn.metrics import recall_score,f1_score
+
+print('Accuracy:',accuracy_score(y_test,y_pred2))
+print('Precision:',precision_score(y_test,y_pred2))
+print('Recall:',recall_score(y_test,y_pred2))
+print('F1:',f1_score(y_test,y_pred2))
+
+from sklearn.decomposition import PCA
+pca=PCA()
+pca.fit(X_train_scaled)
+
+variance=pca.explained_variance_ratio_
+
+cumulative=np.cumsum(variance)
+
+print(variance.shape)
+
+print(cumulative.shape)
+
+plt.figure(figsize=(10,6))
+plt.plot(range(1,31),cumulative*100,'o-',color='orange',label=' Variance')
+plt.axhline(95,linestyle='--',color='black',label='95% Variance')
+plt.axvline(10,linestyle=':',color='red',label='Components')
+plt.title('Varince Plot')
+plt.xlabel('Principle Components')
+plt.ylabel('Explained Variance')
+plt.xticks(range(1,31))
+plt.grid()
+plt.legend()
+plt.show()
+
+model4=PCA(n_components=10)
+
+X_train_new=model4.fit_transform(X_train_scaled)
+X_test_new=model4.transform(X_test_scaled)
+
+model5=LogisticRegression()
+model5.fit(X_train_new,y_train)
+y_pred5=model5.predict(X_test_new)
+
+print('Accuracy:',accuracy_score(y_test,y_pred5))
+print('Precision:',precision_score(y_test,y_pred5))
+print('Recall:',recall_score(y_test,y_pred5))
+print('F1:',f1_score(y_test,y_pred5))

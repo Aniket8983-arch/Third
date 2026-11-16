@@ -1,0 +1,76 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+df=pd.read_csv("Heart_dataset.csv")
+df.describe()
+
+df.shape
+
+df.drop("Unnamed: 0",axis=1)
+
+print(df.duplicated().sum())
+
+df.drop_duplicates()
+
+df.isna().sum()
+
+numerical_cols=df.select_dtypes(include=np.number).columns
+categorical_cols=df.select_dtypes(include='str').columns
+
+for cols in numerical_cols:
+    df[cols]=df[cols].fillna(df[cols].median())
+
+for cols in categorical_cols:
+    df[cols]=df[cols].fillna(df[cols].mode()[0])
+
+df.isna().sum()
+
+from sklearn.preprocessing import LabelEncoder
+le=LabelEncoder()
+df['AHD']=le.fit_transform(df['AHD'])
+df.head()
+
+df=pd.get_dummies(
+    df,
+    columns=["ChestPain","Thal"],
+    drop_first=True
+)
+df.head()
+
+df=df.astype(int)
+
+df.head()
+
+df[["Age","RestBP","Chol","MaxHR"]].hist(
+    figsize=(12,8),
+    bins=10,
+    edgecolor='black'
+)
+plt.tight_layout()
+plt.show()
+
+plt.figure(figsize=(12,8))
+sns.boxplot(x=df['Chol'])
+
+plt.title("Boxplot of Cholestrol")
+plt.xlabel("Cholestrol")
+plt.show()
+
+from sklearn.preprocessing import StandardScaler
+scaler=StandardScaler()
+
+df[["RestBP","Chol","MaxHR"]]=scaler.fit_transform(df[["RestBP","Chol","MaxHR"]])
+df.head()
+
+X=df.drop('AHD',axis=1)
+y=df['AHD']
+
+from sklearn.model_selection import train_test_split
+
+X_train,X_test,y_train,y_test= train_test_split(X,y,test_size=0.2,random_state=42)
+
+numerical_new=df.select_dtypes(include=np.number)
+
+print("Mean:\n",numerical_new.mean())

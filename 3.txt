@@ -1,0 +1,61 @@
+graph={}
+heu={}
+
+num=int(input('Vertices:'))
+
+for i in range(num):
+    src=input('Source:')
+    src_h=int(input(f'Heuristic of {src}:'))
+
+    dest=input('Destination:')
+    dest_h=int(input(f'Heuristic of {dest}:'))
+
+    heu[src]=src_h
+    heu[dest]=dest_h
+
+    if src not in graph:
+        graph[src]=[]
+    graph[src].append(dest)
+
+    print('Graph:',graph)
+    print('Heuristic:',heu)
+    
+start=input('Start node:')
+goal=input('Goal node:')
+
+path_found=False
+
+open=[start]
+closed=[]
+parent={start:None}
+
+while len(open) > 0:
+    current=open[0]
+    for node in open:
+        if heu[node] < heu[current]:
+            current=node
+    open.remove(current)
+    closed.append(current)
+
+    print(f'Current: {current} (h={heu[current]})')
+    print('Open list:',open)
+    print('Closed list:',closed)
+
+    if current==goal:
+        path_found=True
+        break
+
+    for neighbor in graph.get(current,[]):
+        if neighbor not in open and neighbor not in closed:
+            parent[neighbor]=current
+            open.append(neighbor)
+
+if path_found:
+    ans=[]
+    node=goal
+    while node is not None:
+        ans.append(node)
+        node=parent[node]
+    ans.reverse()
+
+    print(ans)
